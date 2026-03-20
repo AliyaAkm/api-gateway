@@ -29,7 +29,7 @@ func main() {
 	}
 
 	server := &http.Server{
-		Addr:         cfg.HTTPAddr,
+		Addr:         cfg.ListenAddr(),
 		Handler:      handler,
 		ReadTimeout:  cfg.HTTP.ReadTimeout,
 		WriteTimeout: cfg.HTTP.WriteTimeout,
@@ -40,7 +40,7 @@ func main() {
 	defer stop()
 
 	go func() {
-		log.Println("gateway started on", cfg.HTTPAddr)
+		log.Println("gateway started on", cfg.ListenAddr())
 		if err := server.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
 			log.Fatal("server error:", err)
 		}

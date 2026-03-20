@@ -6,7 +6,7 @@ import (
 
 type BuilderInput struct {
 	Auth         domain.Upstream
-	Course       domain.Upstream
+	Curriculum   domain.Upstream
 	Lesson       domain.Upstream
 	Enrollment   domain.Upstream
 	Progress     domain.Upstream
@@ -18,72 +18,81 @@ type Service struct {
 }
 
 func NewService(input BuilderInput) *Service {
+	routes := make([]domain.Route, 0, 9)
+
+	appendRoute := func(route domain.Route) {
+		if route.Upstream.BaseURL == "" {
+			return
+		}
+		routes = append(routes, route)
+	}
+
+	appendRoute(domain.Route{
+		Name:           "auth",
+		GatewayPrefix:  "/api/v1/auth",
+		UpstreamPrefix: "/auth",
+		Protected:      false,
+		Upstream:       input.Auth,
+	})
+	appendRoute(domain.Route{
+		Name:           "users",
+		GatewayPrefix:  "/api/v1/users",
+		UpstreamPrefix: "/users",
+		Protected:      true,
+		Upstream:       input.Auth,
+	})
+	appendRoute(domain.Route{
+		Name:           "roles",
+		GatewayPrefix:  "/api/v1/roles",
+		UpstreamPrefix: "/roles",
+		Protected:      true,
+		Upstream:       input.Auth,
+	})
+	appendRoute(domain.Route{
+		Name:           "user_roles",
+		GatewayPrefix:  "/api/v1/user_roles",
+		UpstreamPrefix: "/user_roles",
+		Protected:      true,
+		Upstream:       input.Auth,
+	})
+	appendRoute(domain.Route{
+		Name:           "courses",
+		GatewayPrefix:  "/api/v1/courses",
+		UpstreamPrefix: "/courses",
+		Protected:      false,
+		Upstream:       input.Curriculum,
+	})
+	appendRoute(domain.Route{
+		Name:           "lessons",
+		GatewayPrefix:  "/api/v1/lessons",
+		UpstreamPrefix: "/lessons",
+		Protected:      false,
+		Upstream:       input.Lesson,
+	})
+	appendRoute(domain.Route{
+		Name:           "enrollments",
+		GatewayPrefix:  "/api/v1/enrollments",
+		UpstreamPrefix: "/enrollments",
+		Protected:      true,
+		Upstream:       input.Enrollment,
+	})
+	appendRoute(domain.Route{
+		Name:           "progress",
+		GatewayPrefix:  "/api/v1/progress",
+		UpstreamPrefix: "/progress",
+		Protected:      true,
+		Upstream:       input.Progress,
+	})
+	appendRoute(domain.Route{
+		Name:           "notifications",
+		GatewayPrefix:  "/api/v1/notifications",
+		UpstreamPrefix: "/notifications",
+		Protected:      true,
+		Upstream:       input.Notification,
+	})
+
 	return &Service{
-		routes: []domain.Route{
-			{
-				Name:           "auth",
-				GatewayPrefix:  "/api/v1/auth",
-				UpstreamPrefix: "/auth",
-				Protected:      false,
-				Upstream:       input.Auth,
-			},
-			{
-				Name:           "users",
-				GatewayPrefix:  "/api/v1/users",
-				UpstreamPrefix: "/users",
-				Protected:      true,
-				Upstream:       input.Auth,
-			},
-			{
-				Name:           "roles",
-				GatewayPrefix:  "/api/v1/roles",
-				UpstreamPrefix: "/roles",
-				Protected:      true,
-				Upstream:       input.Auth,
-			},
-			{
-				Name:           "user_roles",
-				GatewayPrefix:  "/api/v1/user_roles",
-				UpstreamPrefix: "/user_roles",
-				Protected:      true,
-				Upstream:       input.Auth,
-			},
-			{
-				Name:           "courses",
-				GatewayPrefix:  "/api/v1/courses",
-				UpstreamPrefix: "/courses",
-				Protected:      false,
-				Upstream:       input.Course,
-			},
-			{
-				Name:           "lessons",
-				GatewayPrefix:  "/api/v1/lessons",
-				UpstreamPrefix: "/lessons",
-				Protected:      false,
-				Upstream:       input.Lesson,
-			},
-			{
-				Name:           "enrollments",
-				GatewayPrefix:  "/api/v1/enrollments",
-				UpstreamPrefix: "/enrollments",
-				Protected:      true,
-				Upstream:       input.Enrollment,
-			},
-			{
-				Name:           "progress",
-				GatewayPrefix:  "/api/v1/progress",
-				UpstreamPrefix: "/progress",
-				Protected:      true,
-				Upstream:       input.Progress,
-			},
-			{
-				Name:           "notifications",
-				GatewayPrefix:  "/api/v1/notifications",
-				UpstreamPrefix: "/notifications",
-				Protected:      true,
-				Upstream:       input.Notification,
-			},
-		},
+		routes: routes,
 	}
 }
 

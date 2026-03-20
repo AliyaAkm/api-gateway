@@ -2,6 +2,9 @@ package config
 
 import (
 	"fmt"
+	"net"
+	"net/url"
+	"os"
 	"strings"
 	"time"
 
@@ -22,7 +25,21 @@ type CORSConfig struct {
 }
 
 type UpstreamConfig struct {
-	URL string `env:"URL"`
+	URL string `env:"URL" envDefault:""`
+}
+
+func (u UpstreamConfig) BaseURL() string {
+	value := strings.TrimSpace(u.URL)
+	if value == "" {
+		return ""
+	}
+
+	parsed, err := url.Parse(value)
+	if err == nil && parsed.Scheme != "" && parsed.Host != "" {
+		return strings.TrimRight(value, "/")
+	}
+
+	return "http://" + strings.TrimRight(value, "/")
 }
 
 type Config struct {
@@ -32,7 +49,7 @@ type Config struct {
 	CORS        CORSConfig `envPrefix:"CORS_"`
 
 	Auth         UpstreamConfig `envPrefix:"AUTH_SERVICE_"`
-	Course       UpstreamConfig `envPrefix:"COURSE_SERVICE_"`
+	Curriculum   UpstreamConfig `envPrefix:"CURRICULUM_SERVICE_"`
 	Lesson       UpstreamConfig `envPrefix:"LESSON_SERVICE_"`
 	Enrollment   UpstreamConfig `envPrefix:"ENROLLMENT_SERVICE_"`
 	Progress     UpstreamConfig `envPrefix:"PROGRESS_SERVICE_"`
@@ -58,20 +75,29 @@ func ReadEnv() (*Config, error) {
 }
 
 func (c *Config) validate() error {
-	required := map[string]string{
-		"AUTH_SERVICE_URL":         c.Auth.URL,
-		"COURSE_SERVICE_URL":       c.Course.URL,
-		"LESSON_SERVICE_URL":       c.Lesson.URL,
-		"ENROLLMENT_SERVICE_URL":   c.Enrollment.URL,
-		"PROGRESS_SERVICE_URL":     c.Progress.URL,
-		"NOTIFICATION_SERVICE_URL": c.Notification.URL,
+	configured := []string{
+		c.Auth.BaseURL(),
+		c.Curriculum.BaseURL(),
+		c.Lesson.BaseURL(),
+		c.Enrollment.BaseURL(),
+		c.Progress.BaseURL(),
+		c.Notification.BaseURL(),
 	}
 
-	for key, value := range required {
-		if strings.TrimSpace(value) == "" {
-			return fmt.Errorf("%s is required", key)
+	for _, value := range configured {
+		if strings.TrimSpace(value) != "" {
+			return nil
 		}
 	}
 
-	return nil
+	return fmt.Errorf("at least one upstream service URL is required")
+}
+
+func (c Config) ListenAddr() string {
+	port := strings.TrimSpace(os.Getenv("PORT"))
+	if port == "" {
+		return c.HTTPAddr
+	}
+
+	return net.JoinHostPort("", port)
 }

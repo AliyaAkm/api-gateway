@@ -18,22 +18,14 @@ The project follows clean architecture principles:
 
 - `/api/v1/auth/*` -> auth-service
 - `/api/v1/users/*` -> auth-service
-- `/api/v1/courses/*` -> course-service
+- `/api/v1/courses/*` -> curriculum-service
 - `/api/v1/lessons/*` -> lesson-service
 - `/api/v1/enrollments/*` -> enrollment-service
 - `/api/v1/progress/*` -> progress-service
 - `/api/v1/notifications/*` -> notification-service
 - `/health` and `/api/v1/health` -> gateway health check
 
-## Auth-service integration
-
-The gateway forwards:
-
-- `/api/v1/auth/*` -> `http://localhost:8080/auth/*`
-
-This matches your `auth-service`, because it listens on `HTTP_ADDR=:8080` and registers auth endpoints under `/auth`.
-
-## Run
+## Run locally
 
 1. Create `.env` from `.env.example`
 2. Run:
@@ -51,6 +43,17 @@ _ = godotenv.Load(".env")
 
 cfg, err := config.ReadEnv()
 ```
+
+## Render deployment notes
+
+- The gateway supports Render's `PORT` environment variable automatically.
+- On Render, `PORT` has priority over `HTTP_ADDR`.
+- `HTTP_ADDR` is still used for local development.
+- Only configured upstream services are registered as routes.
+- Upstream URLs must be reachable from Render.
+- `localhost` upstream URLs will not work after deployment to Render.
+- Use either Render internal service URLs or public service URLs for upstream services.
+- Render internal `host:port` values are also supported and are normalized to `http://host:port`.
 
 ## Notes
 
