@@ -1,0 +1,5 @@
+.env
+.gocache/
+.gopath/
+gateway.exe
+.idea/
