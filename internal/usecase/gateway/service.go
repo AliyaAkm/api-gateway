@@ -56,9 +56,9 @@ func NewService(input BuilderInput) *Service {
 		Upstream:       input.Auth,
 	})
 	appendRoute(domain.Route{
-		Name:           "courses",
-		GatewayPrefix:  "/api/v1/courses",
-		UpstreamPrefix: "/courses",
+		Name:           "course",
+		GatewayPrefix:  "/api/v1/course",
+		UpstreamPrefix: "/course",
 		Protected:      false,
 		Upstream:       input.Curriculum,
 	})

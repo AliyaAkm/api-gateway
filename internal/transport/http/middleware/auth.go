@@ -1,22 +1,107 @@
 package middleware
 
 import (
-	"net/http"
-	"strings"
-
+	"gateway/internal/domain"
+	"gateway/internal/service/jwt"
+	"gateway/internal/transport/http/respond"
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
+	"strings"
 )
 
-func RequireAuthHeader() gin.HandlerFunc {
+const (
+	contextUserIDKey = "auth.user_id"
+	contextRolesKey  = "auth.roles"
+)
+
+func Authenticate(jwtMgr *jwt.Manager) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		authHeader := strings.TrimSpace(c.GetHeader("Authorization"))
-		if authHeader == "" {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
-				"error": "authorization header is required",
-			})
+		tokenStr := bearerToken(c.GetHeader("Authorization"))
+		if tokenStr == "" {
+			respond.Error(c, 401, "unauthorized", "missing bearer token")
+			c.Abort()
 			return
 		}
 
+		claims, err := jwtMgr.VerifyAccessToken(tokenStr)
+		if err != nil {
+			respond.Error(c, 401, "unauthorized", "invalid token")
+			c.Abort()
+			return
+		}
+		if !claims.IsActive {
+			respond.Error(c, 403, "inactive_user", domain.ErrInactiveUser.Error())
+			c.Abort()
+			return
+		}
+
+		userID, err := uuid.Parse(claims.Subject)
+		if err != nil {
+			respond.Error(c, 400, "validation", "invalid user id")
+			c.Abort()
+			return
+		}
+
+		c.Set(contextUserIDKey, userID)
+		c.Set(contextRolesKey, claims.Roles)
 		c.Next()
 	}
+}
+
+func RequireRole(requiredRoles ...string) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		currentRoles := CurrentRoles(c)
+		for _, currentRole := range currentRoles {
+			for _, allowedRole := range requiredRoles {
+				if currentRole == allowedRole {
+					c.Next()
+					return
+				}
+			}
+		}
+
+		respond.Error(c, 403, "forbidden", domain.ErrForbidden.Error())
+		c.Abort()
+	}
+}
+
+func CurrentUserID(c *gin.Context) (uuid.UUID, bool) {
+	value, ok := c.Get(contextUserIDKey)
+	if !ok {
+		return uuid.UUID{}, false
+	}
+
+	userID, ok := value.(uuid.UUID)
+	if !ok {
+		return uuid.UUID{}, false
+	}
+
+	return userID, ok
+}
+
+func CurrentRoles(c *gin.Context) []string {
+	value, ok := c.Get(contextRolesKey)
+	if !ok {
+		return nil
+	}
+
+	roles, ok := value.([]string)
+	if !ok {
+		return nil
+	}
+
+	return roles
+}
+
+func bearerToken(header string) string {
+	if header == "" {
+		return ""
+	}
+
+	const prefix = "Bearer "
+	if !strings.HasPrefix(header, prefix) {
+		return ""
+	}
+
+	return strings.TrimSpace(strings.TrimPrefix(header, prefix))
 }

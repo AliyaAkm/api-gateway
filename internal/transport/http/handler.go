@@ -4,11 +4,11 @@ import (
 	"gateway/internal/config"
 	domain "gateway/internal/domain/gateway"
 	"gateway/internal/infrastructure/proxy"
+	"gateway/internal/service/jwt"
 	healthhandler "gateway/internal/transport/http/handlers"
 	"gateway/internal/transport/http/middleware"
 	"gateway/internal/transport/http/router"
 	gatewayuc "gateway/internal/usecase/gateway"
-
 	"github.com/gin-gonic/gin"
 )
 
@@ -24,6 +24,12 @@ func NewHandler(cfg *config.Config) (*gin.Engine, error) {
 
 	proxyFactory := proxy.NewFactory()
 	health := healthhandler.New(cfg.ServiceName, gatewayService.Services())
+	jwtMgr := jwt.New(
+		[]byte(cfg.JWT.Secret),
+		cfg.JWT.Issuer,
+		cfg.JWT.Audience,
+		cfg.JWT.AccessTTL,
+	)
 
 	return router.New(
 		gatewayService.Routes(),
@@ -35,5 +41,6 @@ func NewHandler(cfg *config.Config) (*gin.Engine, error) {
 			middleware.Logger(),
 			middleware.Recover(),
 		},
+		jwtMgr,
 	)
 }

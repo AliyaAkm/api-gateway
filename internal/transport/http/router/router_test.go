@@ -29,9 +29,9 @@ func TestNewRegistersRoutesWithoutConflicts(t *testing.T) {
 			Upstream:       domain.Upstream{Name: "auth", BaseURL: "http://localhost:8080"},
 		},
 		{
-			Name:           "courses",
-			GatewayPrefix:  "/api/v1/courses",
-			UpstreamPrefix: "/courses",
+			Name:           "course",
+			GatewayPrefix:  "/api/v1/course",
+			UpstreamPrefix: "/course",
 			Upstream:       domain.Upstream{Name: "course", BaseURL: "http://localhost:8083"},
 		},
 	}

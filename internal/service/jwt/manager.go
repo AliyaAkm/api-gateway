@@ -1,0 +1,115 @@
+package jwt
+
+import (
+	"gateway/internal/domain"
+	jwtlib "github.com/golang-jwt/jwt/v5"
+	"github.com/google/uuid"
+	"time"
+)
+
+type Claims struct {
+	Role     string   `json:"role"`
+	Roles    []string `json:"roles,omitempty"`
+	IsActive bool     `json:"is_active"`
+	jwtlib.RegisteredClaims
+}
+
+type Manager struct {
+	secret   []byte
+	issuer   string
+	audience string
+	ttl      time.Duration
+}
+
+func New(secret []byte, issuer, audience string, ttl time.Duration) *Manager {
+	return &Manager{secret: secret, issuer: issuer, audience: audience, ttl: ttl}
+}
+
+func (m *Manager) NewAccessToken(userID uuid.UUID, primaryRole string, roles []string, isActive bool) (string, error) {
+	now := time.Now()
+	claims := Claims{
+		Role:     primaryRole,
+		Roles:    normalizeRoleClaims(primaryRole, roles),
+		IsActive: isActive,
+		RegisteredClaims: jwtlib.RegisteredClaims{
+			Issuer:    m.issuer,
+			Subject:   userID.String(),
+			Audience:  jwtlib.ClaimStrings{m.audience},
+			IssuedAt:  jwtlib.NewNumericDate(now),
+			ExpiresAt: jwtlib.NewNumericDate(now.Add(m.ttl)),
+		},
+	}
+	t := jwtlib.NewWithClaims(jwtlib.SigningMethodHS256, claims)
+	return t.SignedString(m.secret)
+}
+
+func (m *Manager) VerifyAccessToken(tokenStr string) (*Claims, error) {
+	claims, err := m.Verify(tokenStr)
+	if err != nil {
+		return nil, domain.ErrInvalidToken
+	}
+	return claims, nil
+}
+
+func (m *Manager) Verify(tokenStr string) (*Claims, error) {
+	parser := jwtlib.NewParser(jwtlib.WithValidMethods([]string{jwtlib.SigningMethodHS256.Alg()}))
+
+	tok, err := parser.ParseWithClaims(tokenStr, &Claims{}, func(token *jwtlib.Token) (any, error) {
+		return m.secret, nil
+	})
+	if err != nil {
+		return nil, domain.ErrInvalidToken
+	}
+
+	claims, ok := tok.Claims.(*Claims)
+	if !ok || !tok.Valid {
+		return nil, domain.ErrInvalidToken
+	}
+
+	if claims.Issuer != m.issuer {
+		return nil, domain.ErrInvalidToken
+	}
+
+	if !audienceHas(claims.Audience, m.audience) {
+		return nil, domain.ErrInvalidToken
+	}
+
+	claims.Roles = normalizeRoleClaims(claims.Role, claims.Roles)
+	if claims.Role == "" && len(claims.Roles) > 0 {
+		claims.Role = claims.Roles[0]
+	}
+
+	return claims, nil
+}
+
+func audienceHas(auds jwtlib.ClaimStrings, want string) bool {
+	for _, a := range auds {
+		if a == want {
+			return true
+		}
+	}
+	return false
+}
+
+func normalizeRoleClaims(primaryRole string, roles []string) []string {
+	normalized := make([]string, 0, len(roles)+1)
+
+	add := func(role string) {
+		if role == "" || !domain.IsValidRoleCode(role) {
+			return
+		}
+		for _, existing := range normalized {
+			if existing == role {
+				return
+			}
+		}
+		normalized = append(normalized, role)
+	}
+
+	add(primaryRole)
+	for _, role := range roles {
+		add(role)
+	}
+
+	return normalized
+}

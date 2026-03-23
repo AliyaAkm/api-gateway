@@ -2,6 +2,7 @@ package router
 
 import (
 	"fmt"
+	"gateway/internal/service/jwt"
 	"net/http"
 
 	domain "gateway/internal/domain/gateway"
@@ -10,6 +11,13 @@ import (
 	healthhandler "gateway/internal/transport/http/handlers"
 
 	"github.com/gin-gonic/gin"
+)
+
+const (
+	RoleStudent = "student"
+	RoleTeacher = "teacher"
+	RoleManager = "manager"
+	RoleAdmin   = "admin"
 )
 
 type ProxyFactory interface {
@@ -21,6 +29,7 @@ func New(
 	proxyFactory ProxyFactory,
 	health *healthhandler.HealthHandler,
 	globalMiddlewares []gin.HandlerFunc,
+	jwtMgr *jwt.Manager,
 ) (*gin.Engine, error) {
 	engine := gin.New()
 	engine.Use(globalMiddlewares...)
@@ -36,7 +45,7 @@ func New(
 
 		routeHandlers := make([]gin.HandlerFunc, 0, 2)
 		if route.Protected {
-			routeHandlers = append(routeHandlers, middleware.RequireAuthHeader())
+			routeHandlers = append(routeHandlers, middleware.Authenticate(jwtMgr), middleware.RequireRole(RoleStudent))
 		}
 		routeHandlers = append(routeHandlers, gin.WrapH(proxyHandler))
 

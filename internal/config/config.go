@@ -42,9 +42,18 @@ func (u UpstreamConfig) BaseURL() string {
 	return "http://" + strings.TrimRight(value, "/")
 }
 
+type JWTConfig struct {
+	Secret     string        `env:"SECRET"`
+	Issuer     string        `env:"ISSUER"`
+	Audience   string        `env:"AUDIENCE"`
+	AccessTTL  time.Duration `env:"ACCESS_TTL"`
+	RefreshTTL time.Duration `env:"REFRESH_TTL"`
+}
+
 type Config struct {
-	ServiceName string `env:"SERVICE_NAME" envDefault:"education-gateway"`
-	HTTPAddr    string `env:"HTTP_ADDR" envDefault:":8090"`
+	ServiceName string    `env:"SERVICE_NAME" envDefault:"education-gateway"`
+	HTTPAddr    string    `env:"HTTP_ADDR" envDefault:":8090"`
+	JWT         JWTConfig `envPrefix:"JWT_"`
 	HTTP        HTTPConfig
 	CORS        CORSConfig `envPrefix:"CORS_"`
 

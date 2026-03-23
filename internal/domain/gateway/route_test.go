@@ -3,14 +3,14 @@ package gateway
 import "testing"
 
 func TestRouteMatches(t *testing.T) {
-	route := Route{GatewayPrefix: "/api/v1/courses"}
+	route := Route{GatewayPrefix: "/api/v1/course"}
 
 	cases := []struct {
 		path string
 		want bool
 	}{
-		{path: "/api/v1/courses", want: true},
-		{path: "/api/v1/courses/42", want: true},
+		{path: "/api/v1/course", want: true},
+		{path: "/api/v1/course/42", want: true},
 		{path: "/api/v1/course", want: false},
 		{path: "/api/v1/courseships", want: false},
 	}
