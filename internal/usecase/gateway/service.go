@@ -63,13 +63,6 @@ func NewService(input BuilderInput) *Service {
 		Upstream:       input.Curriculum,
 	})
 	appendRoute(domain.Route{
-		Name:           "lessons",
-		GatewayPrefix:  "/api/v1/lessons",
-		UpstreamPrefix: "/lessons",
-		Protected:      false,
-		Upstream:       input.Lesson,
-	})
-	appendRoute(domain.Route{
 		Name:           "enrollments",
 		GatewayPrefix:  "/api/v1/enrollments",
 		UpstreamPrefix: "/enrollments",
@@ -90,7 +83,67 @@ func NewService(input BuilderInput) *Service {
 		Protected:      true,
 		Upstream:       input.Notification,
 	})
+	appendRoute(domain.Route{
+		Name:           "course_dictionary_status",
+		GatewayPrefix:  "/api/v1/dictionary/status",
+		UpstreamPrefix: "/dictionary/status",
+		Protected:      false,
+		Upstream:       input.Curriculum,
+	})
 
+	appendRoute(domain.Route{
+		Name:           "course_dictionary_level",
+		GatewayPrefix:  "/api/v1/dictionary/level",
+		UpstreamPrefix: "/dictionary/level",
+		Protected:      false,
+		Upstream:       input.Curriculum,
+	})
+
+	appendRoute(domain.Route{
+		Name:           "course_dictionary_duration_category",
+		GatewayPrefix:  "/api/v1/dictionary/duration_category",
+		UpstreamPrefix: "/dictionary/duration_category",
+		Protected:      false,
+		Upstream:       input.Curriculum,
+	})
+
+	appendRoute(domain.Route{
+		Name:           "course_dictionary_topic",
+		GatewayPrefix:  "/api/v1/dictionary/topic",
+		UpstreamPrefix: "/dictionary/topic",
+		Protected:      false,
+		Upstream:       input.Curriculum,
+	})
+
+	appendRoute(domain.Route{
+		Name:           "course_dictionary_tag",
+		GatewayPrefix:  "/api/v1/dictionary/tag",
+		UpstreamPrefix: "/dictionary/tag",
+		Protected:      false,
+		Upstream:       input.Curriculum,
+	})
+
+	appendRoute(domain.Route{
+		Name:           "course_dictionary_locale",
+		GatewayPrefix:  "/api/v1/dictionary/locale",
+		UpstreamPrefix: "/dictionary/locale",
+		Protected:      false,
+		Upstream:       input.Curriculum,
+	})
+	appendRoute(domain.Route{
+		Name:           "module",
+		GatewayPrefix:  "/api/v1/module",
+		UpstreamPrefix: "/module",
+		Protected:      false,
+		Upstream:       input.Curriculum,
+	})
+	appendRoute(domain.Route{
+		Name:           "lesson",
+		GatewayPrefix:  "/api/v1/lesson",
+		UpstreamPrefix: "/lesson",
+		Protected:      false,
+		Upstream:       input.Curriculum,
+	})
 	return &Service{
 		routes: routes,
 	}
