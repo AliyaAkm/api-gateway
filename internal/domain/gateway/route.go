@@ -12,6 +12,7 @@ type Route struct {
 	GatewayPrefix  string
 	UpstreamPrefix string
 	Protected      bool
+	AllowedRoles   []string
 	Upstream       Upstream
 }
 

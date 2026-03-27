@@ -44,9 +44,15 @@ func New(
 		}
 
 		routeHandlers := make([]gin.HandlerFunc, 0, 2)
+
 		if route.Protected {
-			routeHandlers = append(routeHandlers, middleware.Authenticate(jwtMgr), middleware.RequireRole(RoleStudent, RoleAdmin))
+			routeHandlers = append(routeHandlers, middleware.Authenticate(jwtMgr))
+
+			if len(route.AllowedRoles) > 0 {
+				routeHandlers = append(routeHandlers, middleware.RequireRole(route.AllowedRoles...))
+			}
 		}
+
 		routeHandlers = append(routeHandlers, gin.WrapH(proxyHandler))
 
 		engine.Any(route.GatewayPrefix, routeHandlers...)

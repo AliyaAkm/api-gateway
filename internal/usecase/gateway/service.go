@@ -2,6 +2,7 @@ package gateway
 
 import (
 	domain "gateway/internal/domain/gateway"
+	"gateway/internal/transport/http/router"
 )
 
 type BuilderInput struct {
@@ -39,6 +40,7 @@ func NewService(input BuilderInput) *Service {
 		GatewayPrefix:  "/api/v1/users",
 		UpstreamPrefix: "/users",
 		Protected:      true,
+		AllowedRoles:   []string{router.RoleAdmin, router.RoleManager},
 		Upstream:       input.Auth,
 	})
 	appendRoute(domain.Route{
@@ -46,6 +48,7 @@ func NewService(input BuilderInput) *Service {
 		GatewayPrefix:  "/api/v1/roles",
 		UpstreamPrefix: "/roles",
 		Protected:      true,
+		AllowedRoles:   []string{router.RoleAdmin},
 		Upstream:       input.Auth,
 	})
 	appendRoute(domain.Route{
@@ -53,13 +56,14 @@ func NewService(input BuilderInput) *Service {
 		GatewayPrefix:  "/api/v1/user_roles",
 		UpstreamPrefix: "/user_roles",
 		Protected:      true,
+		AllowedRoles:   []string{router.RoleAdmin},
 		Upstream:       input.Auth,
 	})
 	appendRoute(domain.Route{
 		Name:           "course",
 		GatewayPrefix:  "/api/v1/course",
 		UpstreamPrefix: "/course",
-		Protected:      false,
+		Protected:      true,
 		Upstream:       input.Curriculum,
 	})
 	appendRoute(domain.Route{
@@ -87,7 +91,7 @@ func NewService(input BuilderInput) *Service {
 		Name:           "course_dictionary_status",
 		GatewayPrefix:  "/api/v1/dictionary/status",
 		UpstreamPrefix: "/dictionary/status",
-		Protected:      false,
+		Protected:      true,
 		Upstream:       input.Curriculum,
 	})
 
@@ -95,7 +99,7 @@ func NewService(input BuilderInput) *Service {
 		Name:           "course_dictionary_level",
 		GatewayPrefix:  "/api/v1/dictionary/level",
 		UpstreamPrefix: "/dictionary/level",
-		Protected:      false,
+		Protected:      true,
 		Upstream:       input.Curriculum,
 	})
 
@@ -103,7 +107,7 @@ func NewService(input BuilderInput) *Service {
 		Name:           "course_dictionary_duration_category",
 		GatewayPrefix:  "/api/v1/dictionary/duration_category",
 		UpstreamPrefix: "/dictionary/duration_category",
-		Protected:      false,
+		Protected:      true,
 		Upstream:       input.Curriculum,
 	})
 
@@ -111,7 +115,7 @@ func NewService(input BuilderInput) *Service {
 		Name:           "course_dictionary_topic",
 		GatewayPrefix:  "/api/v1/dictionary/topic",
 		UpstreamPrefix: "/dictionary/topic",
-		Protected:      false,
+		Protected:      true,
 		Upstream:       input.Curriculum,
 	})
 
@@ -119,7 +123,7 @@ func NewService(input BuilderInput) *Service {
 		Name:           "course_dictionary_tag",
 		GatewayPrefix:  "/api/v1/dictionary/tag",
 		UpstreamPrefix: "/dictionary/tag",
-		Protected:      false,
+		Protected:      true,
 		Upstream:       input.Curriculum,
 	})
 
@@ -127,21 +131,21 @@ func NewService(input BuilderInput) *Service {
 		Name:           "course_dictionary_locale",
 		GatewayPrefix:  "/api/v1/dictionary/locale",
 		UpstreamPrefix: "/dictionary/locale",
-		Protected:      false,
+		Protected:      true,
 		Upstream:       input.Curriculum,
 	})
 	appendRoute(domain.Route{
 		Name:           "module",
 		GatewayPrefix:  "/api/v1/module",
 		UpstreamPrefix: "/module",
-		Protected:      false,
+		Protected:      true,
 		Upstream:       input.Curriculum,
 	})
 	appendRoute(domain.Route{
 		Name:           "lesson",
 		GatewayPrefix:  "/api/v1/lesson",
 		UpstreamPrefix: "/lesson",
-		Protected:      false,
+		Protected:      true,
 		Upstream:       input.Curriculum,
 	})
 	return &Service{
