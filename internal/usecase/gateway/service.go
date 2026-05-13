@@ -148,6 +148,13 @@ func NewService(input BuilderInput) *Service {
 		Protected:      true,
 		Upstream:       input.Curriculum,
 	})
+	appendRoute(domain.Route{
+		Name:           "streak",
+		GatewayPrefix:  "/api/v1/streak",
+		UpstreamPrefix: "streak",
+		Protected:      true,
+		Upstream:       input.Curriculum,
+	})
 	return &Service{
 		routes: routes,
 	}
