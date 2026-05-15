@@ -57,12 +57,9 @@ type Config struct {
 	HTTP        HTTPConfig
 	CORS        CORSConfig `envPrefix:"CORS_"`
 
-	Auth         UpstreamConfig `envPrefix:"AUTH_SERVICE_"`
-	Curriculum   UpstreamConfig `envPrefix:"CURRICULUM_SERVICE_"`
-	Lesson       UpstreamConfig `envPrefix:"LESSON_SERVICE_"`
-	Enrollment   UpstreamConfig `envPrefix:"ENROLLMENT_SERVICE_"`
-	Progress     UpstreamConfig `envPrefix:"PROGRESS_SERVICE_"`
-	Notification UpstreamConfig `envPrefix:"NOTIFICATION_SERVICE_"`
+	Auth       UpstreamConfig `envPrefix:"AUTH_SERVICE_"`
+	Curriculum UpstreamConfig `envPrefix:"CURRICULUM_SERVICE_"`
+	Payment    UpstreamConfig `envPrefix:"PAYMENT_SERVICE_"`
 }
 
 func ReadEnv() (*Config, error) {
@@ -87,10 +84,7 @@ func (c *Config) validate() error {
 	configured := []string{
 		c.Auth.BaseURL(),
 		c.Curriculum.BaseURL(),
-		c.Lesson.BaseURL(),
-		c.Enrollment.BaseURL(),
-		c.Progress.BaseURL(),
-		c.Notification.BaseURL(),
+		c.Payment.BaseURL(),
 	}
 
 	for _, value := range configured {

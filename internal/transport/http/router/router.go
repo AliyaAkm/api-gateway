@@ -51,6 +51,10 @@ func New(
 			if len(route.AllowedRoles) > 0 {
 				routeHandlers = append(routeHandlers, middleware.RequireRole(route.AllowedRoles...))
 			}
+
+			if len(route.WriteRoles) > 0 {
+				routeHandlers = append(routeHandlers, middleware.RequireRoleForWriteMethodsExcept(route.WriteRoleExemptSuffixes, route.WriteRoles...))
+			}
 		}
 
 		routeHandlers = append(routeHandlers, gin.WrapH(proxyHandler))

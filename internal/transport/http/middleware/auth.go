@@ -6,6 +6,7 @@ import (
 	"gateway/internal/transport/http/respond"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
+	"net/http"
 	"strings"
 )
 
@@ -62,6 +63,28 @@ func RequireRole(requiredRoles ...string) gin.HandlerFunc {
 
 		respond.Error(c, 403, "forbidden", domain.ErrForbidden.Error())
 		c.Abort()
+	}
+}
+
+func RequireRoleForWriteMethods(requiredRoles ...string) gin.HandlerFunc {
+	return RequireRoleForWriteMethodsExcept(nil, requiredRoles...)
+}
+
+func RequireRoleForWriteMethodsExcept(exemptSuffixes []string, requiredRoles ...string) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		switch c.Request.Method {
+		case http.MethodPost, http.MethodPut, http.MethodPatch, http.MethodDelete:
+			for _, suffix := range exemptSuffixes {
+				if strings.HasSuffix(c.Request.URL.Path, suffix) {
+					c.Next()
+					return
+				}
+			}
+			RequireRole(requiredRoles...)(c)
+			return
+		default:
+			c.Next()
+		}
 	}
 }
 

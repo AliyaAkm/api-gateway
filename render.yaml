@@ -36,3 +36,8 @@ services:
           type: pserv
           name: curriculum-service
           property: hostport
+      - key: PAYMENT_SERVICE_URL
+        fromService:
+          type: pserv
+          name: payment-service
+          property: hostport

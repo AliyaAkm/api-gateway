@@ -14,12 +14,9 @@ import (
 
 func NewHandler(cfg *config.Config) (*gin.Engine, error) {
 	gatewayService := gatewayuc.NewService(gatewayuc.BuilderInput{
-		Auth:         domain.Upstream{Name: "auth", BaseURL: cfg.Auth.BaseURL()},
-		Curriculum:   domain.Upstream{Name: "curriculum", BaseURL: cfg.Curriculum.BaseURL()},
-		Lesson:       domain.Upstream{Name: "lesson", BaseURL: cfg.Lesson.BaseURL()},
-		Enrollment:   domain.Upstream{Name: "enrollment", BaseURL: cfg.Enrollment.BaseURL()},
-		Progress:     domain.Upstream{Name: "progress", BaseURL: cfg.Progress.BaseURL()},
-		Notification: domain.Upstream{Name: "notification", BaseURL: cfg.Notification.BaseURL()},
+		Auth:       domain.Upstream{Name: "auth", BaseURL: cfg.Auth.BaseURL()},
+		Curriculum: domain.Upstream{Name: "curriculum", BaseURL: cfg.Curriculum.BaseURL()},
+		Payment:    domain.Upstream{Name: "payment", BaseURL: cfg.Payment.BaseURL()},
 	})
 
 	proxyFactory := proxy.NewFactory()

@@ -7,10 +7,7 @@ Only configured upstreams are exposed as routes.
 
 - `AUTH_SERVICE_URL`
 - `CURRICULUM_SERVICE_URL`
-- `LESSON_SERVICE_URL`
-- `ENROLLMENT_SERVICE_URL`
-- `PROGRESS_SERVICE_URL`
-- `NOTIFICATION_SERVICE_URL`
+- `PAYMENT_SERVICE_URL`
 
 Each upstream value can be provided in either format:
 

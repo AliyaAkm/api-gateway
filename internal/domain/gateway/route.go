@@ -8,12 +8,14 @@ type Upstream struct {
 }
 
 type Route struct {
-	Name           string
-	GatewayPrefix  string
-	UpstreamPrefix string
-	Protected      bool
-	AllowedRoles   []string
-	Upstream       Upstream
+	Name                    string
+	GatewayPrefix           string
+	UpstreamPrefix          string
+	Protected               bool
+	AllowedRoles            []string
+	WriteRoles              []string
+	WriteRoleExemptSuffixes []string
+	Upstream                Upstream
 }
 
 type ServiceInfo struct {

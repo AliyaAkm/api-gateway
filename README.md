@@ -18,11 +18,22 @@ The project follows clean architecture principles:
 
 - `/api/v1/auth/*` -> auth-service
 - `/api/v1/users/*` -> auth-service
-- `/api/v1/courses/*` -> curriculum-service
-- `/api/v1/lessons/*` -> lesson-service
-- `/api/v1/enrollments/*` -> enrollment-service
-- `/api/v1/progress/*` -> progress-service
-- `/api/v1/notifications/*` -> notification-service
+- `/api/v1/course/*` -> curriculum-service
+- `/api/v1/module/*` -> curriculum-service
+- `/api/v1/lesson/*` -> curriculum-service
+- `/api/v1/practice/*` -> curriculum-service
+- `/api/v1/quiz/*` -> curriculum-service
+- `/api/v1/review/*` -> curriculum-service
+- `/api/v1/point/*` -> curriculum-service
+- `/api/v1/leaderboard/*` -> curriculum-service
+- `/api/v1/progress/*` -> curriculum-service
+- `/api/v1/achievements/*` -> curriculum-service
+- `/api/v1/streak/*` -> curriculum-service
+- `/api/v1/dictionary/*` -> curriculum-service
+- `/api/v1/order/*` -> payment-service
+- `/api/v1/price/*` -> payment-service
+- `/api/v1/payment_method/*` -> payment-service
+- `/api/v1/payment/*` -> payment-service
 - `/health` and `/api/v1/health` -> gateway health check
 
 ## Run locally

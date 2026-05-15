@@ -6,12 +6,9 @@ import (
 )
 
 type BuilderInput struct {
-	Auth         domain.Upstream
-	Curriculum   domain.Upstream
-	Lesson       domain.Upstream
-	Enrollment   domain.Upstream
-	Progress     domain.Upstream
-	Notification domain.Upstream
+	Auth       domain.Upstream
+	Curriculum domain.Upstream
+	Payment    domain.Upstream
 }
 
 type Service struct {
@@ -19,7 +16,7 @@ type Service struct {
 }
 
 func NewService(input BuilderInput) *Service {
-	routes := make([]domain.Route, 0, 9)
+	routes := make([]domain.Route, 0, 24)
 
 	appendRoute := func(route domain.Route) {
 		if route.Upstream.BaseURL == "" {
@@ -74,25 +71,46 @@ func NewService(input BuilderInput) *Service {
 		Upstream:       input.Curriculum,
 	})
 	appendRoute(domain.Route{
-		Name:           "enrollments",
-		GatewayPrefix:  "/api/v1/enrollments",
-		UpstreamPrefix: "/enrollments",
-		Protected:      true,
-		Upstream:       input.Enrollment,
-	})
-	appendRoute(domain.Route{
 		Name:           "progress",
 		GatewayPrefix:  "/api/v1/progress",
 		UpstreamPrefix: "/progress",
 		Protected:      true,
-		Upstream:       input.Progress,
+		Upstream:       input.Curriculum,
 	})
 	appendRoute(domain.Route{
-		Name:           "notifications",
-		GatewayPrefix:  "/api/v1/notifications",
-		UpstreamPrefix: "/notifications",
+		Name:           "achievements",
+		GatewayPrefix:  "/api/v1/achievements",
+		UpstreamPrefix: "/achievements",
 		Protected:      true,
-		Upstream:       input.Notification,
+		Upstream:       input.Curriculum,
+	})
+	appendRoute(domain.Route{
+		Name:           "order",
+		GatewayPrefix:  "/api/v1/order",
+		UpstreamPrefix: "/order",
+		Protected:      true,
+		Upstream:       input.Payment,
+	})
+	appendRoute(domain.Route{
+		Name:           "price",
+		GatewayPrefix:  "/api/v1/price",
+		UpstreamPrefix: "/price",
+		Protected:      true,
+		Upstream:       input.Payment,
+	})
+	appendRoute(domain.Route{
+		Name:           "payment_method",
+		GatewayPrefix:  "/api/v1/payment_method",
+		UpstreamPrefix: "/payment_method",
+		Protected:      true,
+		Upstream:       input.Payment,
+	})
+	appendRoute(domain.Route{
+		Name:           "payment",
+		GatewayPrefix:  "/api/v1/payment",
+		UpstreamPrefix: "/payment",
+		Protected:      true,
+		Upstream:       input.Payment,
 	})
 	appendRoute(domain.Route{
 		Name:           "course_dictionary_status",
@@ -149,11 +167,13 @@ func NewService(input BuilderInput) *Service {
 		Upstream:       input.Curriculum,
 	})
 	appendRoute(domain.Route{
-		Name:           "lesson",
-		GatewayPrefix:  "/api/v1/lesson",
-		UpstreamPrefix: "/lesson",
-		Protected:      true,
-		Upstream:       input.Curriculum,
+		Name:                    "lesson",
+		GatewayPrefix:           "/api/v1/lesson",
+		UpstreamPrefix:          "/lesson",
+		Protected:               true,
+		WriteRoles:              []string{router.RoleTeacher, router.RoleAdmin},
+		WriteRoleExemptSuffixes: []string{"/complete"},
+		Upstream:                input.Curriculum,
 	})
 	appendRoute(domain.Route{
 		Name:           "practice",
@@ -170,9 +190,30 @@ func NewService(input BuilderInput) *Service {
 		Upstream:       input.Curriculum,
 	})
 	appendRoute(domain.Route{
+		Name:           "review",
+		GatewayPrefix:  "/api/v1/review",
+		UpstreamPrefix: "/review",
+		Protected:      true,
+		Upstream:       input.Curriculum,
+	})
+	appendRoute(domain.Route{
+		Name:           "point",
+		GatewayPrefix:  "/api/v1/point",
+		UpstreamPrefix: "/point",
+		Protected:      true,
+		Upstream:       input.Curriculum,
+	})
+	appendRoute(domain.Route{
+		Name:           "leaderboard",
+		GatewayPrefix:  "/api/v1/leaderboard",
+		UpstreamPrefix: "/leaderboard",
+		Protected:      true,
+		Upstream:       input.Curriculum,
+	})
+	appendRoute(domain.Route{
 		Name:           "streak",
 		GatewayPrefix:  "/api/v1/streak",
-		UpstreamPrefix: "streak",
+		UpstreamPrefix: "/streak",
 		Protected:      true,
 		Upstream:       input.Curriculum,
 	})
