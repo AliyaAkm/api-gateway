@@ -2,9 +2,11 @@ package jwt
 
 import (
 	"gateway/internal/domain"
+	"slices"
+	"time"
+
 	jwtlib "github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
-	"time"
 )
 
 type Claims struct {
@@ -83,12 +85,7 @@ func (m *Manager) Verify(tokenStr string) (*Claims, error) {
 }
 
 func audienceHas(auds jwtlib.ClaimStrings, want string) bool {
-	for _, a := range auds {
-		if a == want {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(auds, want)
 }
 
 func normalizeRoleClaims(primaryRole string, roles []string) []string {
@@ -98,10 +95,8 @@ func normalizeRoleClaims(primaryRole string, roles []string) []string {
 		if role == "" || !domain.IsValidRoleCode(role) {
 			return
 		}
-		for _, existing := range normalized {
-			if existing == role {
-				return
-			}
+		if slices.Contains(normalized, role) {
+			return
 		}
 		normalized = append(normalized, role)
 	}

@@ -25,7 +25,7 @@ func main() {
 
 	handler, err := transporthttp.NewHandler(cfg)
 	if err != nil {
-		log.Fatal("handler setup error:", err)
+		log.Fatal("handlers setup error:", err)
 	}
 
 	server := &http.Server{

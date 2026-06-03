@@ -4,6 +4,8 @@ import (
 	"gateway/internal/domain"
 	"gateway/internal/service/jwt"
 	"gateway/internal/transport/http/respond"
+	"slices"
+
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"net/http"
@@ -52,13 +54,11 @@ func Authenticate(jwtMgr *jwt.Manager) gin.HandlerFunc {
 func RequireRole(requiredRoles ...string) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		currentRoles := CurrentRoles(c)
-		for _, currentRole := range currentRoles {
-			for _, allowedRole := range requiredRoles {
-				if currentRole == allowedRole {
-					c.Next()
-					return
-				}
-			}
+		if slices.ContainsFunc(currentRoles, func(currentRole string) bool {
+			return slices.Contains(requiredRoles, currentRole)
+		}) {
+			c.Next()
+			return
 		}
 
 		respond.Error(c, 403, "forbidden", domain.ErrForbidden.Error())
@@ -74,11 +74,14 @@ func RequireRoleForWriteMethodsExcept(exemptSuffixes []string, requiredRoles ...
 	return func(c *gin.Context) {
 		switch c.Request.Method {
 		case http.MethodPost, http.MethodPut, http.MethodPatch, http.MethodDelete:
-			for _, suffix := range exemptSuffixes {
+			if slices.ContainsFunc(exemptSuffixes, func(suffix string) bool {
 				if strings.HasSuffix(c.Request.URL.Path, suffix) {
-					c.Next()
-					return
+					return true
 				}
+				return false
+			}) {
+				c.Next()
+				return
 			}
 			RequireRole(requiredRoles...)(c)
 			return
