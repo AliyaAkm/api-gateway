@@ -6,9 +6,10 @@ import (
 )
 
 type BuilderInput struct {
-	Auth       domain.Upstream
-	Curriculum domain.Upstream
-	Payment    domain.Upstream
+	Auth         domain.Upstream
+	Curriculum   domain.Upstream
+	Payment      domain.Upstream
+	Notification domain.Upstream
 }
 
 type Service struct {
@@ -113,6 +114,13 @@ func NewService(input BuilderInput) *Service {
 		UpstreamPrefix: "/payment",
 		Protected:      true,
 		Upstream:       input.Payment,
+	})
+	appendRoute(domain.Route{
+		Name:           "notifications",
+		GatewayPrefix:  "/api/v1/notifications",
+		UpstreamPrefix: "/notifications",
+		Protected:      true,
+		Upstream:       input.Notification,
 	})
 	appendRoute(domain.Route{
 		Name:           "course_dictionary_status",

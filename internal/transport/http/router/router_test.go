@@ -38,7 +38,7 @@ func TestNewRegistersRoutesWithoutConflicts(t *testing.T) {
 
 	health := healthhandler.New("gateway", nil)
 
-	engine, err := New(routes, stubProxyFactory{}, health, []gin.HandlerFunc{})
+	engine, err := New(routes, stubProxyFactory{}, health, []gin.HandlerFunc{}, nil)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
