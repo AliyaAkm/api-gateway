@@ -17,7 +17,7 @@ type Service struct {
 }
 
 func NewService(input BuilderInput) *Service {
-	routes := make([]domain.Route, 0, 24)
+	routes := make([]domain.Route, 0, 25)
 
 	appendRoute := func(route domain.Route) {
 		if route.Upstream.BaseURL == "" {
@@ -187,13 +187,6 @@ func NewService(input BuilderInput) *Service {
 		Upstream:                input.Curriculum,
 	})
 	appendRoute(domain.Route{
-		Name:           "practice",
-		GatewayPrefix:  "/api/v1/practice",
-		UpstreamPrefix: "/practice",
-		Protected:      true,
-		Upstream:       input.Curriculum,
-	})
-	appendRoute(domain.Route{
 		Name:           "quiz",
 		GatewayPrefix:  "/api/v1/quiz",
 		UpstreamPrefix: "/quiz",
@@ -229,6 +222,22 @@ func NewService(input BuilderInput) *Service {
 		UpstreamPrefix: "/streak",
 		Protected:      true,
 		Upstream:       input.Curriculum,
+	})
+	appendRoute(domain.Route{
+		Name:           "student",
+		GatewayPrefix:  "/api/v1/student",
+		UpstreamPrefix: "/student",
+		Protected:      true,
+		Upstream:       input.Curriculum,
+	})
+	appendRoute(domain.Route{
+		Name:                    "practice",
+		GatewayPrefix:           "/api/v1/practice",
+		UpstreamPrefix:          "/practice",
+		Protected:               true,
+		WriteRoles:              []string{router.RoleTeacher},
+		WriteRoleExemptSuffixes: []string{"/run"},
+		Upstream:                input.Curriculum,
 	})
 	return &Service{
 		routes: routes,

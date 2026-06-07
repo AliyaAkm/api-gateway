@@ -11,7 +11,7 @@ func TestRouteMatches(t *testing.T) {
 	}{
 		{path: "/api/v1/course", want: true},
 		{path: "/api/v1/course/42", want: true},
-		{path: "/api/v1/course", want: false},
+		{path: "/api/v1/cours", want: false},
 		{path: "/api/v1/courseships", want: false},
 	}
 
