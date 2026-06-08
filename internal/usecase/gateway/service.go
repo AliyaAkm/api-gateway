@@ -231,12 +231,27 @@ func NewService(input BuilderInput) *Service {
 		Upstream:       input.Curriculum,
 	})
 	appendRoute(domain.Route{
+		Name:           "practice_submissions",
+		GatewayPrefix:  "/api/v1/practice-submissions",
+		UpstreamPrefix: "/practice-submissions",
+		Protected:      true,
+		Upstream:       input.Curriculum,
+	})
+	appendRoute(domain.Route{
+		Name:           "teacher_practice_submissions",
+		GatewayPrefix:  "/api/v1/teacher/practice-submissions",
+		UpstreamPrefix: "/teacher/practice-submissions",
+		Protected:      true,
+		AllowedRoles:   []string{router.RoleTeacher, router.RoleAdmin},
+		Upstream:       input.Curriculum,
+	})
+	appendRoute(domain.Route{
 		Name:                    "practice",
 		GatewayPrefix:           "/api/v1/practice",
 		UpstreamPrefix:          "/practice",
 		Protected:               true,
 		WriteRoles:              []string{router.RoleTeacher},
-		WriteRoleExemptSuffixes: []string{"/run"},
+		WriteRoleExemptSuffixes: []string{"/run", "/submissions"},
 		Upstream:                input.Curriculum,
 	})
 	return &Service{
