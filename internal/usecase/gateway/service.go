@@ -73,6 +73,22 @@ func NewService(input BuilderInput) *Service {
 		Upstream:       input.Curriculum,
 	})
 	appendRoute(domain.Route{
+		Name:           "courses",
+		GatewayPrefix:  "/api/v1/admin/courses",
+		UpstreamPrefix: "/courses",
+		Protected:      true,
+		WriteRoles:     []string{router.RoleAdmin},
+		Upstream:       input.Curriculum,
+	})
+	appendRoute(domain.Route{
+		Name:           "courses",
+		GatewayPrefix:  "/api/v1/teacher/courses",
+		UpstreamPrefix: "/courses",
+		Protected:      true,
+		WriteRoles:     []string{router.RoleTeacher},
+		Upstream:       input.Curriculum,
+	})
+	appendRoute(domain.Route{
 		Name:           "progress",
 		GatewayPrefix:  "/api/v1/progress",
 		UpstreamPrefix: "/progress",
@@ -246,6 +262,14 @@ func NewService(input BuilderInput) *Service {
 		Upstream:       input.Curriculum,
 	})
 	appendRoute(domain.Route{
+		Name:           "teacher_statistics",
+		GatewayPrefix:  "/api/v1/teacher/statistics",
+		UpstreamPrefix: "/teacher/statistics",
+		Protected:      true,
+		AllowedRoles:   []string{router.RoleTeacher, router.RoleAdmin},
+		Upstream:       input.Curriculum,
+	})
+	appendRoute(domain.Route{
 		Name:                    "practice",
 		GatewayPrefix:           "/api/v1/practice",
 		UpstreamPrefix:          "/practice",
@@ -254,6 +278,7 @@ func NewService(input BuilderInput) *Service {
 		WriteRoleExemptSuffixes: []string{"/run", "/submissions"},
 		Upstream:                input.Curriculum,
 	})
+
 	return &Service{
 		routes: routes,
 	}
